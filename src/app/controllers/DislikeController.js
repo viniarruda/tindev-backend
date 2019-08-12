@@ -3,9 +3,9 @@ import Developer from '../models/Developer';
 class DislikeController {
   async store(req, res) {
     const { devId } = req.params;
-    const { id } = req.body;
+    const { user } = req.headers;
 
-    const loggedDev = await Developer.findByPk(id);
+    const loggedDev = await Developer.findByPk(user);
     const targetDev = await Developer.findByPk(devId);
 
     if (!targetDev) {

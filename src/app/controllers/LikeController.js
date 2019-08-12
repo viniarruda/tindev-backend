@@ -3,9 +3,9 @@ import Developer from '../models/Developer';
 class LikeController {
   async store(req, res) {
     const { devId } = req.params;
-    const { id } = req.body;
+    const { user } = req.headers;
 
-    const loggedDev = await Developer.findByPk(id);
+    const loggedDev = await Developer.findByPk(user);
     const targetDev = await Developer.findByPk(devId);
 
     if (!targetDev) {
@@ -13,7 +13,16 @@ class LikeController {
     }
 
     if (targetDev.likes.includes(loggedDev.id)) {
-      console.log('DEU MATCH');
+      const loggedSocket = req.connectedUsers[user];
+      const targetSocket = req.connectedUsers[devId];
+
+      if (loggedSocket) {
+        req.io.to(loggedSocket).emit('match', targetDev);
+      }
+
+      if (targetSocket) {
+        req.io.to(targetSocket).emit('match', loggedDev);
+      }
     }
 
     const filteredLikes = [...loggedDev.likes, targetDev.id];

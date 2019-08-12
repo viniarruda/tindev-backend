@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import axios from 'axios';
-import { Op } from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 
 import Developer from '../models/Developer';
 
@@ -55,11 +55,12 @@ class DeveloperController {
           {
             id: {
               [Op.ne]: loggedDev.id,
-              [Op.notIn]: [+loggedDev.likes, +loggedDev.dislikes],
+              [Op.notIn]: [...loggedDev.likes, ...loggedDev.dislikes],
             },
           },
         ],
       },
+      order: [Sequelize.fn('RANDOM')],
     });
 
     return res.json(users);
